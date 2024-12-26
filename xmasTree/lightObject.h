@@ -7,6 +7,8 @@ class Light {
     Light(uint8_t xCoor, uint8_t yCoor);
     void TurnOn();
     void TurnOff();
+    uint8_t _xCoor;
+    uint8_t _yCoor;
   
   private:
     uint8_t columnPin;
