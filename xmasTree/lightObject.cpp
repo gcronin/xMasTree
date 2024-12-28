@@ -11,17 +11,14 @@ Light::Light(uint8_t xCoor, uint8_t yCoor) {
   pinMode(ringPin, OUTPUT);
   digitalWrite(columnPin, LOW);
   digitalWrite(ringPin, LOW);
-  litStatus = false;
 }
 
 void Light::TurnOn() {
   digitalWrite(columnPin, HIGH);
   digitalWrite(ringPin, HIGH);
-  litStatus = true;
 }
 
 void Light::TurnOff() {
   digitalWrite(columnPin, LOW);
   digitalWrite(ringPin, LOW);
-  litStatus = false;
 }
