@@ -1,7 +1,7 @@
 #include "lightDefinitions.h"
 
 long timeStamp;
-boolean step = 1;
+uint8_t step = 1;
 
 char colors[3] = {'r', 'g', 'b'};
 uint8_t colorIndex = 0;
@@ -39,34 +39,20 @@ void AllOn(boolean StarOn, long rate) {
   }
 }
 
-void Alternating(boolean StarOn, long rate) {
+void Alternating(boolean StarOn, long rate, uint8_t mod) {
   if(millis() - timeStamp > rate) {
     timeStamp = millis();
-    step = 1- step;
+    step = (1 + step)%mod;
     if(StarOn) colorIndex = (colorIndex + 1)%3;
   }
 
-  if(step == 1) {
-    for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
-      if((lights[i]->_xCoor + lights[i]->_yCoor)%2== 0) {
-        lights[i]->TurnOn();
-        delayMicroseconds(100);
-        lights[i]->TurnOff();
-        if(StarOn) TopOn(colors[colorIndex]);
-      }
+  for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
+    if((lights[i]->_xCoor + lights[i]->_yCoor)%mod== step) {
+      lights[i]->TurnOn();
+      delayMicroseconds(100);
+      lights[i]->TurnOff();
+      if(StarOn) TopOn(colors[colorIndex]);
     }
   }
-  else {
-    for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
-      if((lights[i]->_xCoor + lights[i]->_yCoor)%2== 1) {
-        lights[i]->TurnOn();
-        delayMicroseconds(100);
-        lights[i]->TurnOff();
-        if(StarOn) TopOn(colors[colorIndex]);
-      }
-    }
-  }
-
-  
 }
 

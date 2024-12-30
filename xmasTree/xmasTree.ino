@@ -4,7 +4,7 @@
 uint8_t buttonPin = 2;
 uint8_t soundSensePin = 3;
 uint8_t redLEDPin = 13; 
-uint8_t mode = 1;
+uint8_t mode = 2;
 
 
 void setup() {
@@ -22,7 +22,7 @@ void loop() {
       AllOn(true, 1000);
       break;
     case 2:
-      Alternating(true, 1000);
+      Alternating(true, 250, 3);
       break;
   }
   
