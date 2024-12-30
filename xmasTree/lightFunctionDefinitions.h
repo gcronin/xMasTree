@@ -6,6 +6,14 @@ uint8_t step = 1;
 char colors[3] = {'r', 'g', 'b'};
 uint8_t colorIndex = 0;
 
+void takeStep(boolean StarOn, long rate, uint8_t mod) {
+  if(millis() - timeStamp > rate) {
+    timeStamp = millis();
+    step = (1 + step)%mod;
+    if(StarOn) colorIndex = (colorIndex + 1)%3;
+  }
+}
+
 void TopOn(char color) {
   switch (color) {
     case 'r':
@@ -40,11 +48,7 @@ void AllOn(boolean StarOn, long rate) {
 }
 
 void Alternating(boolean StarOn, long rate, uint8_t mod) {
-  if(millis() - timeStamp > rate) {
-    timeStamp = millis();
-    step = (1 + step)%mod;
-    if(StarOn) colorIndex = (colorIndex + 1)%3;
-  }
+  takeStep(StarOn, rate, mod);
 
   for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
     if((lights[i]->_xCoor + lights[i]->_yCoor)%mod== step) {
@@ -55,4 +59,39 @@ void Alternating(boolean StarOn, long rate, uint8_t mod) {
     }
   }
 }
+
+void Columns(boolean StarOn, long rate) {
+  takeStep(StarOn, rate, 8);
+
+  for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
+    if(lights[i]->_xCoor == step) {
+      lights[i]->TurnOn();
+      delayMicroseconds(100);
+      lights[i]->TurnOff();
+      if(StarOn) TopOn(colors[colorIndex]);
+    }
+  }
+}
+
+void Rings(long rate) {
+  takeStep(true, rate, 8);
+
+  if(step == 7) {
+    TopOn(colors[colorIndex]);
+  }
+  else {
+    for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
+      if(lights[i]->_yCoor == step) {
+        lights[i]->TurnOn();
+        delayMicroseconds(100);
+        lights[i]->TurnOff();
+      }
+    }
+  }
+}
+
+void Fill(long rate) {
+  
+}
+
 
