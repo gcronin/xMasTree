@@ -19,7 +19,7 @@ void TopOn(char color) {
       break;
   }
   PORTB |= (1 << 7);
-  delay(10);
+  delayMicroseconds(100);
   PORTB &= (0 << 7);
   PORTC = B00000000;
 }
@@ -29,8 +29,9 @@ void AllOn(boolean StarOn, long rate) {
     lights[i]->TurnOn();
     delayMicroseconds(100);
     lights[i]->TurnOff();
+    if(StarOn) TopOn(colors[colorIndex]);
   }
-  if(StarOn) TopOn(colors[colorIndex]);
+  
   
   if(millis() - timeStamp > rate) {
     timeStamp = millis();
@@ -51,6 +52,7 @@ void Alternating(boolean StarOn, long rate) {
         lights[i]->TurnOn();
         delayMicroseconds(100);
         lights[i]->TurnOff();
+        if(StarOn) TopOn(colors[colorIndex]);
       }
     }
   }
@@ -60,10 +62,11 @@ void Alternating(boolean StarOn, long rate) {
         lights[i]->TurnOn();
         delayMicroseconds(100);
         lights[i]->TurnOff();
+        if(StarOn) TopOn(colors[colorIndex]);
       }
     }
   }
 
-  if(StarOn) TopOn(colors[colorIndex]);
+  
 }
 
