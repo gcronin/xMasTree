@@ -4,7 +4,7 @@
 uint8_t buttonPin = 2;
 uint8_t soundSensePin = 3;
 uint8_t redLEDPin = 13; 
-uint8_t mode = 4;
+uint8_t mode = 0;
 
 
 void setup() {
@@ -13,11 +13,15 @@ void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
   pinMode(soundSensePin, INPUT);
   timeStamp = millis();
+  timeStamp2 = millis();
 }
 
 
 void loop() {
   switch(mode) {
+    case 0:
+      Lines(100);
+      break;
     case 1:
       AllOn(true, 1000);
       break;
