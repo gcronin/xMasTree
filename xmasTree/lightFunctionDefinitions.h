@@ -2,17 +2,17 @@
 
 long timeStamp;
 long timeStamp2;
+long topTimeStamp;
 uint8_t step = 0;
 uint8_t stepSecondary = 0;
 
 char colors[3] = {'r', 'g', 'b'};
 uint8_t colorIndex = 0;
 
-void takeStep(boolean StarOn, long rate, uint8_t mod) {
+void takeStep(long rate, uint8_t mod) {
   if(millis() - timeStamp > rate) {
     timeStamp = millis();
     step = (1 + step)%mod;
-    if(StarOn) colorIndex = (colorIndex + 1)%3;
   }
 }
 
@@ -22,6 +22,14 @@ void takeSecondaryStep(long rate, uint8_t mod) {
     stepSecondary = (1 + stepSecondary)%mod;
   }
 }
+
+void changeTopColor(long rate) {
+  if(millis() - topTimeStamp > rate) {
+    topTimeStamp = millis();
+    colorIndex = (colorIndex + 1)%3;
+  }
+}
+
 
 void TopOn(char color) {
   switch (color) {
@@ -46,18 +54,14 @@ void AllOn(boolean StarOn, long rate) {
     lights[i]->TurnOn();
     delayMicroseconds(100);
     lights[i]->TurnOff();
-    if(StarOn) TopOn(colors[colorIndex]);
+    if(StarOn) {  TopOn(colors[colorIndex]);  }
   }
-  
-  
-  if(millis() - timeStamp > rate) {
-    timeStamp = millis();
-    if(StarOn) colorIndex = (colorIndex + 1)%3;
-  }
+  changeTopColor(4000);
 }
 
 void Alternating(boolean StarOn, long rate, uint8_t mod) {
-  takeStep(StarOn, rate, mod);
+  takeStep(rate, mod);
+  changeTopColor(4000);
 
   for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
     if((lights[i]->_xCoor + lights[i]->_yCoor)%mod== step) {
@@ -70,7 +74,8 @@ void Alternating(boolean StarOn, long rate, uint8_t mod) {
 }
 
 void Columns(boolean StarOn, long rate) {
-  takeStep(StarOn, rate, 8);
+  takeStep(rate, 8);
+  changeTopColor(4000);
 
   for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
     if(lights[i]->_xCoor == step) {
@@ -83,7 +88,8 @@ void Columns(boolean StarOn, long rate) {
 }
 
 void Rings(long rate) {
-  takeStep(true, rate, 8);
+  takeStep(rate, 8);
+  changeTopColor(5000);
 
   if(step == 7) {
     TopOn(colors[colorIndex]);
@@ -99,34 +105,12 @@ void Rings(long rate) {
   }
 }
 
-void Lines1(long rate) {
-  takeStep(true, rate, 6);
-
-  for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
-    if(lights[i]->_yCoor - lights[i]->_xCoor == step) {
-      lights[i]->TurnOn();
-      delayMicroseconds(100);
-      lights[i]->TurnOff();
-    }
-  }
-}
-
-void Lines2(long rate) {
-  takeStep(true, rate, 6);
-
-  for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
-    if(lights[i]->_xCoor - lights[i]->_yCoor == step) {
-      lights[i]->TurnOn();
-      delayMicroseconds(100);
-      lights[i]->TurnOff();
-    }
-  }
-}
-
-void Lines(long rate) {
+void Lines(boolean StarOn, long forRate, int caseRate) {
   boolean turnOn = false;
-  takeStep(true, rate, 6);
-  takeSecondaryStep(2500, 3);
+  takeStep(forRate, 6);
+  takeSecondaryStep(caseRate, 4);
+  changeTopColor(4000);
+
 
   for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
     switch(stepSecondary) {
@@ -137,7 +121,10 @@ void Lines(long rate) {
         if(lights[i]->_yCoor - lights[i]->_xCoor == step) {turnOn = true;}
         break;
       case 2: 
-        if((lights[i]->_yCoor)*(lights[i]->_yCoor) + lights[i]->_xCoor < step) {turnOn = true;}
+        if((lights[i]->_yCoor)/step == lights[i]->_xCoor) {turnOn = true;}
+        break;
+      case 3: 
+        if((lights[i]->_xCoor)/step == lights[i]->_yCoor) {turnOn = true;}
         break;
     }
     if(turnOn) {
@@ -146,5 +133,6 @@ void Lines(long rate) {
       lights[i]->TurnOff();
       turnOn = false;
     }
+    if(StarOn) TopOn(colors[colorIndex]);
   }
 }
