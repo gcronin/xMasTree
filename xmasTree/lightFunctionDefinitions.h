@@ -5,6 +5,8 @@ long timeStamp2;
 long topTimeStamp;
 uint8_t step = 0;
 uint8_t stepSecondary = 0;
+uint8_t numLit = 0;
+boolean newStep = false;
 
 char colors[3] = {'r', 'g', 'b'};
 uint8_t colorIndex = 0;
@@ -13,6 +15,7 @@ void takeStep(long rate, uint8_t mod) {
   if(millis() - timeStamp > rate) {
     timeStamp = millis();
     step = (1 + step)%mod;
+    newStep = true;
   }
 }
 
@@ -134,5 +137,42 @@ void Lines(boolean StarOn, long forRate, int caseRate) {
       turnOn = false;
     }
     if(StarOn) TopOn(colors[colorIndex]);
+  }
+}
+
+void randomFill(boolean StarOn, long rate) {
+  boolean newLit = false;
+  takeStep(rate, 56);
+  //takeSecondaryStep(caseRate, 4);
+  //changeTopColor(4000);
+  if(newStep) {
+    while(!newLit) {
+      uint8_t Xaddress = random(8);
+      uint8_t Yaddress = random(7);
+      for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
+        if(lights[i]->_xCoor == Xaddress && lights[i]->_yCoor == Yaddress) {
+          if(lights[i]->litStatus == false) {
+            lights[i]->litStatus = true;
+            newLit = true;
+            numLit++;
+          }
+          break;
+        }
+      }
+    }
+    newStep = false;
+  }
+  for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
+    if(lights[i]->litStatus == true) {
+    lights[i]->TurnOn();
+    delayMicroseconds(100);
+    lights[i]->TurnOff();
+    }
+  }
+  if(numLit >= 56) {
+    numLit = 0;
+    for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
+      lights[i]->litStatus = false;
+    }
   }
 }
