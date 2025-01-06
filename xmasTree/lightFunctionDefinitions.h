@@ -143,8 +143,7 @@ void Lines(boolean StarOn, long forRate, int caseRate) {
 void randomFill(boolean StarOn, long rate) {
   boolean newLit = false;
   takeStep(rate, 56);
-  //takeSecondaryStep(caseRate, 4);
-  //changeTopColor(4000);
+  changeTopColor(4000);
   if(newStep) {
     while(!newLit) {
       uint8_t Xaddress = random(8);
@@ -168,6 +167,7 @@ void randomFill(boolean StarOn, long rate) {
     delayMicroseconds(100);
     lights[i]->TurnOff();
     }
+    if(StarOn) TopOn(colors[colorIndex]);
   }
   if(numLit >= 56) {
     numLit = 0;
