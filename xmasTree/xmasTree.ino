@@ -6,7 +6,7 @@ uint8_t soundSensePin = 3;
 uint8_t redLEDPin = 13; 
 volatile uint8_t mode = 6;
 volatile boolean rotate = false;
-static uint8_t numModes = 7;
+static uint8_t numModes = 8;
 long modeTimer;
 
 
@@ -20,6 +20,7 @@ void setup() {
   timeStamp2 = millis();
   topTimeStamp = millis();
   modeTimer = millis();
+  Serial.begin(9600);
 }
 
 void incrementMode() {
@@ -35,9 +36,13 @@ void incrementMode() {
     }
     else {
       mode = (mode + 1);
-      if(mode == 7) {
+      if(mode == numModes) {
         mode = 0;
         rotate = true;
+        // this step below is required to prevent getting stuck in randomFill looking for an unlit light to turn on and not finding one
+        for (size_t i = 0; i < sizeof lights / sizeof lights[0]; i++) {
+          lights[i]->litStatus = false;
+        }
       }
     }
   }
@@ -66,7 +71,10 @@ void loop() {
       Alternating(true, 400, 2);
       break;
     case 6:
-      randomFill(true, 100);
+      randomFill(true, 50);
+      break;
+    case 7:
+      starBursts(true, 150);
       break;
   }
 
